@@ -1,0 +1,2763 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Interview Coach - Branch & Role Specific (Powered by Groq)</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+    <script>
+window.MathJax = {
+    tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']]
+    }
+};
+</script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .main-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            margin: 20px auto;
+            max-width: 1400px;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #56CCF2 0%, #2F80ED 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 20px 20px 0 0;
+            text-align: center;
+        }
+        
+        .header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+            font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .header p {
+            margin: 10px 0 0 0;
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .content-section {
+            padding: 30px;
+        }
+        
+        .api-setup {
+            background: linear-gradient(135deg, #56CCF2 0%, #2F80ED 100%);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            border: none;
+            color: white;
+        }
+        
+        .api-setup h3 {
+            color: white;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        
+        .api-setup .alert {
+            background: rgba(255, 255, 255, 0.95);
+            color: #2d3748;
+            border: none;
+        }
+        
+        .controls-section {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .question-section {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            min-height: 200px;
+        }
+        
+        .answer-section {
+            background: linear-gradient(135deg, #e0c3fc 0%, #9bb5ff 100%);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .feedback-section {
+            background: linear-gradient(135deg, #c3f0ca 0%, #fce38a 100%);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .analytics-section {
+            background: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 10px;
+            padding: 12px 25px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #56ab2f 0%, #a8e6cf 100%);
+            border: none;
+            border-radius: 10px;
+            padding: 12px 25px;
+            font-weight: 600;
+        }
+        
+        .btn-warning {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            border: none;
+            border-radius: 10px;
+            padding: 12px 25px;
+            font-weight: 600;
+            color: white;
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+            border: none;
+            border-radius: 10px;
+            padding: 10px 20px;
+            font-weight: 600;
+            color: white;
+        }
+        
+        .form-control, .form-select {
+            border-radius: 10px;
+            border: 2px solid #e2e8f0;
+            padding: 12px 15px;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: #56CCF2;
+            box-shadow: 0 0 0 0.2rem rgba(86, 204, 242, 0.25);
+        }
+        
+        .timer {
+            background: linear-gradient(135deg, #ff6b6b 0%, #feca57 100%);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            display: inline-block;
+            margin: 10px 0;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        }
+        
+        .status-message {
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px 0;
+            font-weight: 500;
+        }
+        
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #56CCF2;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 8px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .feedback-content {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 30px;
+            margin-top: 15px;
+            line-height: 1.8;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .feedback-score-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            margin: 25px 0;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .feedback-score-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: pulse 3s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+        
+        .feedback-score-card .score-number {
+            font-size: 5rem;
+            font-weight: 900;
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.3);
+            margin: 0;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .feedback-score-card .score-label {
+            font-size: 1.3rem;
+            margin-top: 15px;
+            opacity: 0.95;
+            font-weight: 600;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .feedback-score-card .score-interpretation {
+            font-size: 1rem;
+            margin-top: 10px;
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50px;
+            display: inline-block;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .feedback-section-header {
+            background: linear-gradient(135deg, #56CCF2 0%, #2F80ED 100%);
+            color: white;
+            padding: 20px 25px;
+            border-radius: 15px;
+            margin: 30px 0 20px 0;
+            font-size: 1.5rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            box-shadow: 0 5px 15px rgba(86, 204, 242, 0.3);
+        }
+        
+        .feedback-section-header i {
+            font-size: 2rem;
+            animation: bounce 2s ease-in-out infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+        
+        .feedback-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            margin: 15px 0;
+            box-shadow: 0 3px 15px rgba(0, 0, 0, 0.08);
+            border-left: 5px solid #56CCF2;
+            transition: all 0.3s ease;
+        }
+        
+        .feedback-card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.12);
+        }
+        
+        .feedback-card.strength {
+            border-left-color: #56ab2f;
+            background: linear-gradient(to right, rgba(86, 171, 47, 0.05) 0%, white 20%);
+        }
+        
+        .feedback-card.improvement {
+            border-left-color: #ff6b6b;
+            background: linear-gradient(to right, rgba(255, 107, 107, 0.05) 0%, white 20%);
+        }
+        
+        .feedback-card.recommendation {
+            border-left-color: #f5af19;
+            background: linear-gradient(to right, rgba(245, 175, 25, 0.05) 0%, white 20%);
+        }
+        
+        .feedback-card-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .feedback-card-title .icon-badge {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+        }
+        
+        .strength .icon-badge {
+            background: linear-gradient(135deg, #56ab2f 0%, #a8e6cf 100%);
+            color: white;
+        }
+        
+        .improvement .icon-badge {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+            color: white;
+        }
+        
+        .recommendation .icon-badge {
+            background: linear-gradient(135deg, #f5af19 0%, #fbc531 100%);
+            color: white;
+        }
+        
+        .feedback-card-content {
+            font-size: 1.05rem;
+            line-height: 1.8;
+            color: #4a5568;
+        }
+        
+        .feedback-card-content strong {
+            color: #2d3748;
+            font-weight: 600;
+        }
+        
+        .study-topics {
+            background: linear-gradient(135deg, #e0c3fc 0%, #f3e7ff 100%);
+            border-radius: 12px;
+            padding: 25px;
+            margin: 20px 0;
+        }
+        
+        .study-topics h5 {
+            color: #667eea;
+            font-weight: 700;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+        
+        .study-topic-item {
+            background: white;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+        
+        .study-topic-item strong {
+            color: #667eea;
+            display: block;
+            margin-bottom: 5px;
+            font-size: 1.1rem;
+        }
+        
+        .model-answer-section {
+            background: linear-gradient(135deg, #ffecd2 0%, #fff5e6 100%);
+            border-radius: 12px;
+            padding: 25px;
+            margin: 20px 0;
+        }
+        
+        .model-answer-section h5 {
+            color: #f5af19;
+            font-weight: 700;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+        
+        .key-point {
+            background: white;
+            padding: 15px 20px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border-left: 4px solid #f5af19;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            display: flex;
+            gap: 15px;
+            align-items: flex-start;
+        }
+        
+        .key-point .point-number {
+            background: linear-gradient(135deg, #f5af19 0%, #fbc531 100%);
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+        
+        .key-point-content {
+            flex: 1;
+            font-size: 1.05rem;
+            line-height: 1.7;
+            color: #4a5568;
+        }
+        
+        .complete-solution-section {
+            background: linear-gradient(135deg, #d4fc79 0%, #96e6a1 100%);
+            border-radius: 12px;
+            padding: 30px;
+            margin: 25px 0;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .complete-solution-section h5 {
+            color: #2d5016;
+            font-weight: 700;
+            margin-bottom: 20px;
+            font-size: 1.4rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .solution-approach {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            margin: 15px 0;
+            border-left: 5px solid #56ab2f;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+        }
+        
+        .solution-approach h6 {
+            color: #56ab2f;
+            font-weight: 700;
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .approach-badge {
+            background: linear-gradient(135deg, #56ab2f 0%, #a8e6cf 100%);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        
+        .code-block {
+            background: #2d3748;
+            color: #e2e8f0;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+        
+        .code-block .comment {
+            color: #90cdf4;
+        }
+        
+        .code-block .keyword {
+            color: #fc8181;
+        }
+        
+        .complexity-info {
+            background: rgba(86, 171, 47, 0.1);
+            border-left: 4px solid #56ab2f;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        
+        .complexity-info strong {
+            color: #56ab2f;
+        }
+        
+        .diagram-container {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+            text-align: center;
+            border: 2px dashed #56ab2f;
+        }
+        
+        .step-by-step {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+        }
+        
+        .step-item {
+            display: flex;
+            gap: 15px;
+            padding: 12px;
+            margin: 8px 0;
+            background: rgba(86, 171, 47, 0.05);
+            border-radius: 8px;
+            align-items: flex-start;
+        }
+        
+        .step-number {
+            background: linear-gradient(135deg, #56ab2f 0%, #a8e6cf 100%);
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+        
+        .approach-comparison {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+            overflow-x: auto;
+        }
+        
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+        }
+        
+        .comparison-table th {
+            background: linear-gradient(135deg, #56ab2f 0%, #a8e6cf 100%);
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+        
+        .comparison-table td {
+            padding: 12px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .comparison-table tr:hover {
+            background: rgba(86, 171, 47, 0.05);
+        }
+        
+        .question-content {
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
+            padding: 25px;
+            margin-top: 15px;
+            font-size: 1.15rem;
+            line-height: 1.8;
+            min-height: 100px;
+            font-weight: 500;
+            color: #2d3748;
+            border-left: 5px solid #56CCF2;
+        }
+        
+        .question-content strong {
+            color: #2F80ED;
+            font-weight: 600;
+        }
+        
+        .question-content ul, .question-content ol {
+            margin-top: 15px;
+            margin-bottom: 15px;
+            padding-left: 25px;
+        }
+        
+        .question-content li {
+            margin-bottom: 10px;
+            line-height: 1.6;
+        }
+        
+        .question-content p {
+            margin-bottom: 12px;
+        }
+        
+        .question-metadata {
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 8px;
+            padding: 10px 15px;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+            color: #667eea;
+            font-weight: 600;
+        }
+        
+        .input-group-custom {
+            position: relative;
+        }
+        
+        .toggle-password {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            z-index: 10;
+            font-size: 1.2rem;
+        }
+        
+        .toggle-password:hover {
+            opacity: 0.8;
+        }
+        
+        .stats-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        
+        .stats-card h3 {
+            font-size: 2.5rem;
+            color: #2F80ED;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+        
+        .stats-card p {
+            color: #718096;
+            margin: 0;
+            font-weight: 600;
+        }
+        
+        .chart-container {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .history-item {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .history-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+        }
+        
+        .history-item .badge {
+            font-size: 0.85rem;
+            padding: 5px 10px;
+            margin-right: 5px;
+        }
+
+        .coding-platform-section {
+            background: linear-gradient(135deg, #232526 0%, #414345 100%);
+            border-radius: 12px;
+            padding: 25px;
+            margin: 20px 0;
+            color: white;
+        }
+
+        .coding-platform-section h5 {
+            color: #56CCF2;
+            font-weight: 700;
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .platform-links {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .platform-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+
+        .platform-card:hover {
+            background: rgba(86, 204, 242, 0.2);
+            border-color: #56CCF2;
+            transform: translateY(-3px);
+        }
+
+        .platform-card i {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: #56CCF2;
+        }
+
+        .platform-card h6 {
+            margin: 10px 0 5px 0;
+            color: white;
+            font-weight: 600;
+        }
+
+        .platform-card p {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin: 0;
+        }
+
+        .hr-solution-section {
+            background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%);
+            border-radius: 12px;
+            padding: 25px;
+            margin: 20px 0;
+        }
+
+        .hr-solution-section h5 {
+            color: #d63031;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .star-framework {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .star-item {
+            border-left: 4px solid #d63031;
+            padding: 15px;
+            margin: 10px 0;
+            background: rgba(214, 48, 49, 0.05);
+            border-radius: 5px;
+        }
+
+        .star-item h6 {
+            color: #d63031;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        
+        @media (max-width: 768px) {
+            .main-container {
+                margin: 10px;
+                border-radius: 15px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .content-section {
+                padding: 20px;
+            }
+            
+            .feedback-score-card .score-number {
+                font-size: 3.5rem;
+            }
+            
+            .comparison-table {
+                font-size: 0.85rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="main-container">
+            <div class="header">
+                <h1><i class="fas fa-bolt"></i> AI Interview Coach</h1>
+                <p>Branch & Role Specific | Powered by Groq - 100% FREE & Lightning Fast! ⚡</p>
+            </div>
+            
+            <div class="content-section">
+                <div class="api-setup">
+                    <h3><i class="fas fa-key"></i> Groq API Configuration</h3>
+                    <div class="alert alert-success mb-3">
+                        <strong>🎉 Why Groq is Better:</strong>
+                        <ul class="mb-0 mt-2">
+                            <li><strong>30 requests per minute</strong> - No annoying rate limits!</li>
+                            <li><strong>14,400 requests per day</strong> - More than enough!</li>
+                            <li><strong>⚡ Super fast responses</strong> - Get answers in seconds!</li>
+                            <li><strong>100% FREE forever</strong> - No credit card needed!</li>
+                            <li><strong>Works in India & worldwide</strong> - No regional blocks!</li>
+                        </ul>
+                    </div>
+                    <div class="alert alert-info mb-3">
+                        <strong>📝 Quick Setup (30 seconds):</strong>
+                        <ol class="mb-0 mt-2">
+                            <li>Visit: <a href="https://console.groq.com/keys" target="_blank" class="alert-link"><strong>console.groq.com/keys</strong></a></li>
+                            <li>Sign up with Google (instant, no verification needed)</li>
+                            <li>Click <strong>"Create API Key"</strong></li>
+                            <li>Copy the key (starts with "gsk_...")</li>
+                            <li>Paste below and click "Save & Test"</li>
+                        </ol>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="input-group-custom">
+                                <input type="password" id="apiKey" class="form-control" 
+                                       placeholder="Paste your Groq API key here (gsk_...)" 
+                                       style="padding-right: 50px;">
+                                <button type="button" class="toggle-password" onclick="toggleApiKeyVisibility()">
+                                    <i class="fas fa-eye" id="toggleIcon"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <button class="btn btn-light w-100" onclick="testAndSaveApiKey()" style="font-weight: 600;">
+                                <i class="fas fa-check-circle"></i> Save & Test
+                            </button>
+                        </div>
+                    </div>
+                    <div id="apiTestResult" class="mt-3"></div>
+                </div>
+                
+                <div class="controls-section">
+                    <h3><i class="fas fa-cogs"></i> Interview Configuration</h3>
+                    <div class="row mb-3">
+                        <div class="col-md-3">
+                            <label class="form-label"><strong>AI Model</strong></label>
+                            <select id="aiModel" class="form-select">
+                                <option value="llama-3.3-70b-versatile">Llama 3.3 70B (Best)</option>
+                                <option value="llama-3.1-70b-versatile">Llama 3.1 70B (Smart)</option>
+                                <option value="llama-3.1-8b-instant">Llama 3.1 8B (Fastest)</option>
+                                <option value="mixtral-8x7b-32768">Mixtral 8x7B</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label"><strong>Engineering Branch</strong></label>
+                            <select id="branch" class="form-select" onchange="updateRoles()">
+                                <option value="">Select Branch</option>
+                                <option value="Computer Science">Computer Science</option>
+                                <option value="Electronics and Communication">Electronics & Communication</option>
+                                <option value="Mechanical Engineering">Mechanical Engineering</option>
+                                <option value="Electrical Engineering">Electrical Engineering</option>
+                                <option value="Civil Engineering">Civil Engineering</option>
+                                <option value="Metallurgical Engineering">Metallurgical Engineering</option>
+                                <option value="Mining Engineering">Mining Engineering</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label"><strong>Job Role</strong></label>
+                            <select id="jobRole" class="form-select" onchange="updateRounds()">
+                                <option value="">Select Role</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label"><strong>Interview Round/Topic</strong></label>
+                            <select id="interviewRound" class="form-select">
+                                <option value="">Select Round</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <label class="form-label"><strong>Experience Level</strong></label>
+                            <select id="experienceLevel" class="form-select">
+                                <option value="Entry Level (0-2 years)">Entry Level (0-2 years)</option>
+                                <option value="Mid Level (2-5 years)">Mid Level (2-5 years)</option>
+                                <option value="Senior Level (5-8 years)">Senior Level (5-8 years)</option>
+                                <option value="Lead/Principal (8+ years)">Lead/Principal (8+ years)</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label"><strong>Difficulty</strong></label>
+                            <select id="difficulty" class="form-select">
+                                <option value="Standard">Standard</option>
+                                <option value="Easy">Easy</option>
+                                <option value="Hard">Hard</option>
+                                <option value="Expert">Expert Level</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label"><strong>Action</strong></label>
+                            <button class="btn btn-primary w-100" onclick="generateQuestion()" id="generateBtn">
+                                <i class="fas fa-magic"></i> Generate Question
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="question-section">
+                    <h3><i class="fas fa-question-circle"></i> Interview Question</h3>
+                    <div class="mb-3">
+                        <div class="btn-group w-100" role="group">
+                            <button type="button" class="btn btn-primary" onclick="showAIQuestionMode()" id="aiModeBtn" style="flex: 1;">
+                                <i class="fas fa-robot"></i> AI Generated Question
+                            </button>
+                            <button type="button" class="btn btn-outline-primary" onclick="showCustomQuestionMode()" id="customModeBtn" style="flex: 1;">
+                                <i class="fas fa-pen"></i> Custom Question
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div id="aiQuestionMode">
+                        <div id="questionDisplay" class="question-content">
+                            Click "Save & Test" your API key first, select Branch → Role → Round, then "Generate Question" to get started!
+                        </div>
+                        <div id="questionStatus" class="mt-3"></div>
+                    </div>
+                    
+                    <div id="customQuestionMode" style="display: none;">
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i> <strong>Enter Your Own Question:</strong> Type or paste any interview question you want to practice, then answer it below to get AI feedback!
+                        </div>
+                        <textarea id="customQuestionInput" class="form-control" rows="6" 
+                                  placeholder="Enter your interview question here...&#10;&#10;Example:&#10;- Explain the difference between REST and GraphQL&#10;- Implement a function to reverse a linked list&#10;- Design a URL shortener service&#10;- Tell me about a time you resolved a conflict in your team"
+                                  style="font-size: 1.05rem; line-height: 1.6;"></textarea>
+                        <div class="mt-3">
+                            <button class="btn btn-success" onclick="setCustomQuestion()" id="setCustomBtn">
+                                <i class="fas fa-check"></i> Set Question & Start Timer
+                            </button>
+                            <button class="btn btn-secondary ms-2" onclick="clearCustomQuestion()">
+                                <i class="fas fa-times"></i> Clear
+                            </button>
+                        </div>
+                        <div id="customQuestionStatus" class="mt-3"></div>
+                    </div>
+                </div>
+                
+                <div class="answer-section">
+                    <h3><i class="fas fa-microphone"></i> Your Answer</h3>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <span id="timerDisplay" class="timer">00:00</span>
+                            <small class="text-muted d-block mt-2">⏱️ Timer starts when question is generated</small>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <button class="btn btn-primary" onclick="getAIFeedback()" id="feedbackBtn">
+                                <i class="fas fa-brain"></i> Get AI Feedback
+                            </button>
+                        </div>
+                    </div>
+                    <textarea id="userAnswer" class="form-control" rows="8" 
+                              placeholder="Type your answer here... Take your time to think through the problem and provide a detailed response."></textarea>
+                    <div id="answerStatus" class="mt-3"></div>
+                </div>
+                
+                <div class="feedback-section">
+                    <h3><i class="fas fa-comments"></i> AI Feedback & Detailed Analysis</h3>
+                    <div id="feedbackDisplay" class="feedback-content">
+                        <p class="text-muted text-center" style="padding: 40px 20px; font-size: 1.1rem;">
+                            📝 Answer a question above and click <strong>"Get AI Feedback"</strong> to receive:
+                        </p>
+                        <div class="row text-center">
+                            <div class="col-md-3">
+                                <i class="fas fa-star fa-3x" style="color: #f5af19;"></i>
+                                <h5 class="mt-3">Detailed Score</h5>
+                                <p class="text-muted">With interpretation</p>
+                            </div>
+                            <div class="col-md-3">
+                                <i class="fas fa-check-circle fa-3x" style="color: #56ab2f;"></i>
+                                <h5 class="mt-3">Strengths</h5>
+                                <p class="text-muted">What you did well</p>
+                            </div>
+                            <div class="col-md-3">
+                                <i class="fas fa-lightbulb fa-3x" style="color: #ff6b6b;"></i>
+                                <h5 class="mt-3">Improvements</h5>
+                                <p class="text-muted">Areas to enhance</p>
+                            </div>
+                            <div class="col-md-3">
+                                <i class="fas fa-book fa-3x" style="color: #667eea;"></i>
+                                <h5 class="mt-3">Complete Solution</h5>
+                                <p class="text-muted">Based on question type</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="feedbackStatus" class="mt-3"></div>
+                </div>
+
+                <div class="analytics-section">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h3><i class="fas fa-chart-line"></i> Performance Analytics</h3>
+                        <button class="btn btn-danger btn-sm" onclick="clearHistory()">
+                            <i class="fas fa-trash"></i> Clear History
+                        </button>
+                    </div>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-3">
+                            <div class="stats-card">
+                                <i class="fas fa-question-circle fa-2x" style="color: #56CCF2;"></i>
+                                <h3 id="totalQuestions">0</h3>
+                                <p>Total Questions</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stats-card">
+                                <i class="fas fa-star fa-2x" style="color: #f5af19;"></i>
+                                <h3 id="avgScore">0.0</h3>
+                                <p>Average Score</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stats-card">
+                                <i class="fas fa-clock fa-2x" style="color: #ff6b6b;"></i>
+                                <h3 id="avgTime">0:00</h3>
+                                <p>Avg Time</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stats-card">
+                                <i class="fas fa-trophy fa-2x" style="color: #56ab2f;"></i>
+                                <h3 id="bestScore">0.0</h3>
+                                <p>Best Score</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="chart-container">
+                                <h5 class="text-center mb-3"><i class="fas fa-chart-bar"></i> Score Progress</h5>
+                                <canvas id="scoreChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="chart-container">
+                                <h5 class="text-center mb-3"><i class="fas fa-pie-chart"></i> Question Types</h5>
+                                <canvas id="typeChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="chart-container mt-4">
+                        <h5 class="mb-3"><i class="fas fa-history"></i> Recent History</h5>
+                        <div id="historyList">
+                            <p class="text-muted text-center">No interview history yet. Start practicing to see your progress!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const interviewStructure = {
+            "Computer Science": {
+                "Software Engineer": ["Aptitude", "Technical (DSA)", "System Design", "HR"],
+                "Frontend Developer": ["HTML/CSS/JS Round", "React/Angular Technical", "Project Discussion", "HR"],
+                "Backend Developer": ["Coding Round", "Database + API Design", "System Design", "HR"],
+                "Full Stack Developer": ["Frontend Round", "Backend Round", "Database Design", "System Design", "HR"],
+                "Data Scientist": ["Aptitude", "Statistics/ML", "Coding (Python/R)", "Case Study", "HR"],
+                "DevOps Engineer": ["Linux/CI-CD", "Cloud Round (AWS/GCP)", "Automation Tools", "HR"],
+                "Mobile Developer": ["Mobile Framework Round", "API Integration", "App Architecture", "HR"],
+                "Machine Learning Engineer": ["Maths & Statistics", "ML Model Design", "Deep Learning Concepts", "HR"],
+                "Cloud Architect": ["Cloud Services", "Architecture Design", "Security & Compliance", "HR"],
+                "Cybersecurity Analyst": ["Networking", "Vulnerability & Threat Analysis", "Scenario-Based Questions", "HR"],
+                "Mixed (All Topics - CS)": ["Aptitude", "Programming & Algorithms", "Database Systems", "Operating Systems", "Networking", "Software Engineering", "System Design", "HR"]
+            },
+            "Electronics and Communication": {
+                "Embedded Systems Engineer": ["Aptitude", "C/C++ Technical", "Microcontroller/FPGA Round", "HR"],
+                "VLSI Design Engineer": ["Digital Logic", "Verilog/VHDL", "EDA Tool Round", "HR"],
+                "IoT Developer": ["Aptitude", "Networking/Embedded Round", "Cloud/Integration Round", "HR"],
+                "Signal Processing Engineer": ["Math/Transforms", "DSP Algorithms", "Implementation Discussion", "HR"],
+                "RF Engineer": ["Antenna Theory", "Microwave/EMI Concepts", "Practical Design Round", "HR"],
+                "Mixed (All Topics - ECE)": ["Aptitude", "Analog & Digital Electronics", "Signals & Systems", "Communication Systems", "Microcontrollers & Embedded", "VLSI Concepts", "HR"]
+            },
+            "Mechanical Engineering": {
+                "Design Engineer": ["Aptitude", "CAD/CAE Round", "Thermodynamics/Strength of Materials", "HR"],
+                "Manufacturing Engineer": ["Aptitude", "Production/Quality Round", "Mechanical Concepts", "HR"],
+                "Maintenance Engineer": ["Aptitude", "Machine Diagnosis Round", "Technical Interview", "HR"],
+                "Automotive Engineer": ["Vehicle Dynamics", "IC Engine Round", "Design & Simulation", "HR"],
+                "Thermal Engineer": ["Heat Transfer", "Thermodynamics", "Fluid Mechanics", "HR"],
+                "Mixed (All Topics - Mechanical)": ["Aptitude", "Engineering Mechanics", "Thermodynamics", "Fluid Mechanics", "Machine Design", "Manufacturing", "Mechatronics", "HR"]
+            },
+            "Electrical Engineering": {
+                "Power Systems Engineer": ["Aptitude", "Electrical Concepts", "Protection/Relay Round", "HR"],
+                "Control Systems Engineer": ["Aptitude", "Control Theory", "Practical Applications", "HR"],
+                "Electrical Design Engineer": ["Circuit Design", "Simulation Tools", "Load Calculations", "HR"],
+                "Instrumentation Engineer": ["Sensor Theory", "Signal Conditioning", "Process Control", "HR"],
+                "Mixed (All Topics - Electrical)": ["Aptitude", "Network Theory", "Machines", "Power Systems", "Control Systems", "Electronics", "Measurements", "HR"]
+            },
+            "Civil Engineering": {
+                "Structural Engineer": ["Aptitude", "Structural Analysis", "Design Codes Round", "HR"],
+                "Construction Engineer": ["Aptitude", "Project Management", "Site/Field Discussion", "HR"],
+                "Geotechnical Engineer": ["Soil Mechanics", "Foundation Design", "Case Studies", "HR"],
+                "Transportation Engineer": ["Traffic Engineering", "Pavement Design", "Planning Round", "HR"],
+                "Mixed (All Topics - Civil)": ["Aptitude", "Structural", "Geotechnical", "Transportation", "Environmental", "Construction Management", "HR"]
+            },
+            "Metallurgical Engineering": {
+                "Process Metallurgist": ["Aptitude", "Extractive Metallurgy", "Pyro/Hydro/Electrometallurgy Round", "HR"],
+                "Materials Engineer": ["Aptitude", "Phase Diagrams & Transformations", "Mechanical Testing", "HR"],
+                "Welding Engineer": ["Aptitude", "Welding Processes & Metallurgy", "Defect Analysis", "HR"],
+                "Quality Control Engineer": ["Aptitude", "Non-Destructive Testing", "Microstructure Evaluation", "HR"],
+                "Research Associate (Metallurgy)": ["Aptitude", "Thermodynamics/Kinetics", "Experiment Design/Simulation", "HR"],
+                "Mixed (All Topics - Metallurgy)": ["Aptitude", "Physical Metallurgy", "Extractive Metallurgy", "Mechanical Metallurgy", "Phase Diagrams", "Heat Treatment", "Testing & Failure Analysis", "HR"]
+            },
+            "Mining Engineering": {
+                "Mine Planning Engineer": ["Aptitude", "Mine Design/Planning", "Software Tools (SURPAC/Datamine)", "HR"],
+                "Drilling and Blasting Engineer": ["Aptitude", "Explosives/Drilling Operations", "Field Scenario Questions", "HR"],
+                "Safety Engineer (Mining)": ["Aptitude", "Mine Safety Regulations", "Emergency Handling", "HR"],
+                "Production Engineer (Mining)": ["Aptitude", "Equipment Operations", "Production Optimization", "HR"],
+                "Environmental Engineer (Mining)": ["Aptitude", "Environmental Impact & Control", "Sustainability Round", "HR"],
+                "Mixed (All Topics - Mining)": ["Aptitude", "Mine Planning", "Drilling & Blasting", "Ventilation", "Surveying", "Mining Machinery", "Safety", "Environmental & Legislation", "HR"]
+            }
+        };
+
+        let timerInterval = null;
+        let startTime = null;
+        let currentQuestion = '';
+        let currentQuestionType = '';
+        let currentBranch = '';
+        let currentRole = '';
+        let currentRound = '';
+        let apiKey = '';
+        let isProcessing = false;
+        let interviewHistory = [];
+        let scoreChart = null;
+        let typeChart = null;
+        let isCustomQuestion = false;
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedKey = localStorage.getItem('groq_api_key');
+            if (savedKey) {
+                apiKey = savedKey;
+                document.getElementById('apiKey').value = savedKey;
+            }
+            
+            const savedAnswer = localStorage.getItem('current_answer');
+            if (savedAnswer) {
+                document.getElementById('userAnswer').value = savedAnswer;
+            }
+            
+            document.getElementById('userAnswer').addEventListener('input', function() {
+                localStorage.setItem('current_answer', this.value);
+            });
+            
+            loadHistory();
+            updateAnalytics();
+            initCharts();
+        });
+
+        function updateRoles() {
+            const branch = document.getElementById('branch').value;
+            const roleSelect = document.getElementById('jobRole');
+            const roundSelect = document.getElementById('interviewRound');
+            
+            roleSelect.innerHTML = '<option value="">Select Role</option>';
+            roundSelect.innerHTML = '<option value="">Select Round</option>';
+            
+            if (branch && interviewStructure[branch]) {
+                Object.keys(interviewStructure[branch]).forEach(role => {
+                    const option = document.createElement('option');
+                    option.value = role;
+                    option.textContent = role;
+                    roleSelect.appendChild(option);
+                });
+            }
+        }
+
+        function updateRounds() {
+            const branch = document.getElementById('branch').value;
+            const role = document.getElementById('jobRole').value;
+            const roundSelect = document.getElementById('interviewRound');
+            
+            roundSelect.innerHTML = '<option value="">Select Round</option>';
+            
+            if (branch && role && interviewStructure[branch] && interviewStructure[branch][role]) {
+                interviewStructure[branch][role].forEach(round => {
+                    const option = document.createElement('option');
+                    option.value = round;
+                    option.textContent = round;
+                    roundSelect.appendChild(option);
+                });
+            }
+        }
+        
+        function showAIQuestionMode() {
+            document.getElementById('aiQuestionMode').style.display = 'block';
+            document.getElementById('customQuestionMode').style.display = 'none';
+            document.getElementById('aiModeBtn').className = 'btn btn-primary';
+            document.getElementById('customModeBtn').className = 'btn btn-outline-primary';
+            isCustomQuestion = false;
+        }
+        
+        function showCustomQuestionMode() {
+            document.getElementById('aiQuestionMode').style.display = 'none';
+            document.getElementById('customQuestionMode').style.display = 'block';
+            document.getElementById('aiModeBtn').className = 'btn btn-outline-primary';
+            document.getElementById('customModeBtn').className = 'btn btn-primary';
+            isCustomQuestion = true;
+        }
+        
+        function setCustomQuestion() {
+            const customQuestion = document.getElementById('customQuestionInput').value.trim();
+            
+            if (!customQuestion) {
+                showCustomStatus('Please enter a question first!', 'error');
+                return;
+            }
+            
+            if (customQuestion.length < 20) {
+                showCustomStatus('Please enter a more detailed question (at least 20 characters)', 'error');
+                return;
+            }
+            
+            currentQuestion = customQuestion;
+            currentQuestionType = 'Custom';
+            
+            const formattedQuestion = `<div class="question-metadata">
+                <i class="fas fa-user-edit"></i> Custom Question | 
+                <i class="fas fa-clock"></i> ${new Date().toLocaleTimeString()}
+            </div>
+            <div style="background: rgba(255, 255, 255, 0.9); padding: 20px; border-radius: 8px; margin-top: 15px;">
+                <strong style="color: #2F80ED; font-size: 1.1rem;">Your Question:</strong>
+                <p style="margin-top: 10px; font-size: 1.05rem; line-height: 1.8; color: #2d3748;">${customQuestion.replace(/\n/g, '<br>')}</p>
+            </div>`;
+            
+            document.getElementById('questionDisplay').innerHTML = formattedQuestion;
+            
+            document.getElementById('userAnswer').value = '';
+            localStorage.removeItem('current_answer');
+            document.getElementById('feedbackDisplay').innerHTML = `
+                <p class="text-muted text-center" style="padding: 40px 20px; font-size: 1.1rem;">
+                    📝 Answer your custom question and click <strong>"Get AI Feedback"</strong> for detailed analysis!
+                </p>
+            `;
+            
+            showCustomStatus('✅ Question set! Answer it below and get AI feedback.', 'success');
+            
+            showAIQuestionMode();
+            startTimer();
+            
+            document.getElementById('userAnswer').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        
+        function clearCustomQuestion() {
+            document.getElementById('customQuestionInput').value = '';
+            showCustomStatus('Question cleared', 'success');
+        }
+        
+        function showCustomStatus(message, type) {
+            const element = document.getElementById('customQuestionStatus');
+            element.innerHTML = '';
+            
+            if (type === 'error') {
+                element.innerHTML = `<div class="alert alert-danger mb-0"><i class="fas fa-exclamation-circle"></i> ${message}</div>`;
+            } else if (type === 'success') {
+                element.innerHTML = `<div class="alert alert-success mb-0"><i class="fas fa-check-circle"></i> ${message}</div>`;
+                setTimeout(() => { element.innerHTML = ''; }, 3000);
+            }
+        }
+        
+        function loadHistory() {
+            const saved = localStorage.getItem('interview_history');
+            if (saved) {
+                interviewHistory = JSON.parse(saved);
+            }
+        }
+        
+        function saveHistory() {
+            localStorage.setItem('interview_history', JSON.stringify(interviewHistory));
+            updateAnalytics();
+        }
+        
+        function addToHistory(data) {
+            interviewHistory.unshift({
+                id: Date.now(),
+                timestamp: new Date().toISOString(),
+                ...data
+            });
+            
+            if (interviewHistory.length > 50) {
+                interviewHistory = interviewHistory.slice(0, 50);
+            }
+            
+            saveHistory();
+        }
+        
+        function clearHistory() {
+            if (confirm('Are you sure you want to clear all history? This cannot be undone.')) {
+                interviewHistory = [];
+                localStorage.removeItem('interview_history');
+                updateAnalytics();
+                alert('History cleared successfully!');
+            }
+        }
+        
+        function updateAnalytics() {
+            if (interviewHistory.length === 0) {
+                document.getElementById('totalQuestions').textContent = '0';
+                document.getElementById('avgScore').textContent = '0.0';
+                document.getElementById('avgTime').textContent = '0:00';
+                document.getElementById('bestScore').textContent = '0.0';
+                document.getElementById('historyList').innerHTML = '<p class="text-muted text-center">No interview history yet. Start practicing to see your progress!</p>';
+                updateCharts();
+                return;
+            }
+            
+            const total = interviewHistory.length;
+            const scores = interviewHistory.map(h => h.score).filter(s => s !== undefined);
+            const times = interviewHistory.map(h => h.timeSpent).filter(t => t !== undefined);
+            
+            const avgScore = scores.length > 0 ? (scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(1) : '0.0';
+            const bestScore = scores.length > 0 ? Math.max(...scores).toFixed(1) : '0.0';
+            const avgTime = times.length > 0 ? Math.floor(times.reduce((a, b) => a + b, 0) / times.length) : 0;
+            
+            document.getElementById('totalQuestions').textContent = total;
+            document.getElementById('avgScore').textContent = avgScore;
+            document.getElementById('avgTime').textContent = formatTime(avgTime);
+            document.getElementById('bestScore').textContent = bestScore;
+            
+            displayHistory();
+            updateCharts();
+        }
+        
+        function displayHistory() {
+            const container = document.getElementById('historyList');
+            if (interviewHistory.length === 0) {
+                container.innerHTML = '<p class="text-muted text-center">No interview history yet.</p>';
+                return;
+            }
+            
+            const recent = interviewHistory.slice(0, 10);
+            container.innerHTML = recent.map(item => {
+                const date = new Date(item.timestamp);
+                const scoreColor = item.score >= 8 ? 'success' : item.score >= 6 ? 'warning' : 'danger';
+                
+                return `
+                    <div class="history-item">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                ${item.branch ? `<span class="badge bg-secondary">${item.branch}</span>` : ''}
+                                <span class="badge bg-primary">${item.role || 'N/A'}</span>
+                                <span class="badge bg-info">${item.round || item.type}</span>
+                                ${item.score ? `<span class="badge bg-${scoreColor}">${item.score}/10</span>` : ''}
+                            </div>
+                            <small class="text-muted">${date.toLocaleDateString()} ${date.toLocaleTimeString()}</small>
+                        </div>
+                        <div class="mt-2">
+                            <strong>Q:</strong> ${item.question.substring(0, 100)}...
+                        </div>
+                        ${item.timeSpent ? `<small class="text-muted"><i class="fas fa-clock"></i> ${formatTime(item.timeSpent)}</small>` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function initCharts() {
+            const scoreCtx = document.getElementById('scoreChart');
+            const typeCtx = document.getElementById('typeChart');
+            
+            scoreChart = new Chart(scoreCtx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Score',
+                        data: [],
+                        borderColor: '#56CCF2',
+                        backgroundColor: 'rgba(86, 204, 242, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 10,
+                            ticks: { stepSize: 2 }
+                        }
+                    }
+                }
+            });
+            
+            typeChart = new Chart(typeCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        data: [],
+                        backgroundColor: [
+                            '#56CCF2',
+                            '#2F80ED',
+                            '#56ab2f',
+                            '#f5af19',
+                            '#ff6b6b',
+                            '#a8e6cf'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { position: 'bottom' }
+                    }
+                }
+            });
+        }
+        
+        function updateCharts() {
+            if (!scoreChart || !typeChart) return;
+            
+            const recentScores = interviewHistory
+                .filter(h => h.score !== undefined)
+                .slice(0, 10)
+                .reverse();
+            
+            scoreChart.data.labels = recentScores.map((_, i) => `#${i + 1}`);
+            scoreChart.data.datasets[0].data = recentScores.map(h => h.score);
+            scoreChart.update();
+            
+            const typeCounts = {};
+            interviewHistory.forEach(h => {
+                const type = h.round || h.type || 'Unknown';
+                typeCounts[type] = (typeCounts[type] || 0) + 1;
+            });
+            
+            typeChart.data.labels = Object.keys(typeCounts);
+            typeChart.data.datasets[0].data = Object.values(typeCounts);
+            typeChart.update();
+        }
+        
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${mins}:${secs.toString().padStart(2, '0')}`;
+        }
+        
+        function formatQuestionDisplay(questionText, branch, role, round, experience, difficulty) {
+            let formatted = `<div class="question-metadata">
+                <i class="fas fa-graduation-cap"></i> ${branch} | 
+                <i class="fas fa-briefcase"></i> ${role} | 
+                <i class="fas fa-clipboard-list"></i> ${round} | 
+                <i class="fas fa-chart-line"></i> ${experience} | 
+                <i class="fas fa-star"></i> ${difficulty}
+            </div>`;
+            
+            questionText = questionText.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            questionText = questionText.replace(/^- (.*?)$/gm, '<li>$1</li>');
+            questionText = questionText.replace(
+  /(<li>.*?<\/li>\n?)+/gs,
+
+);
+
+const lines = questionText.split('\n').filter(line => line.trim());
+            lines.forEach(line => {
+                if (!line.includes('<li>') && !line.includes('<ul>')) {
+                    formatted += `<p>${line}</p>`;
+                } else {
+                    formatted += line;
+                }
+            });
+            
+            return formatted;
+        }
+        
+        function toggleApiKeyVisibility() {
+            const apiKeyInput = document.getElementById('apiKey');
+            const toggleIcon = document.getElementById('toggleIcon');
+            
+            if (apiKeyInput.type === 'password') {
+                apiKeyInput.type = 'text';
+                toggleIcon.className = 'fas fa-eye-slash';
+            } else {
+                apiKeyInput.type = 'password';
+                toggleIcon.className = 'fas fa-eye';
+            }
+        }
+        
+        async function testAndSaveApiKey() {
+            const key = document.getElementById('apiKey').value.trim();
+            
+            if (!key) {
+                showApiTestResult('Please enter an API key', 'error');
+                return;
+            }
+            
+            if (!key.startsWith('gsk_')) {
+                showApiTestResult('Groq API keys start with "gsk_". Please check your key from console.groq.com/keys', 'error');
+                return;
+            }
+            
+            showApiTestResult('⚡ Testing Groq API key...', 'loading');
+            
+            try {
+                const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${key}`
+                    },
+                    body: JSON.stringify({
+                        model: 'llama-3.1-8b-instant',
+                        messages: [{
+                            role: 'user',
+                            content: 'Reply with just "OK"'
+                        }],
+                        max_tokens: 5
+                    })
+                });
+                
+                if (response.ok) {
+                    apiKey = key;
+                    localStorage.setItem('groq_api_key', apiKey);
+                    showApiTestResult('✅ Perfect! Your API key works. Ready to generate questions!', 'success');
+                } else {
+                    const errorData = await response.json().catch(() => ({}));
+                    let errorMsg = 'API key test failed.';
+                    
+                    if (response.status === 401) {
+                        errorMsg = 'Invalid API key. Get a new one from: https://console.groq.com/keys';
+                    } else if (response.status === 429) {
+                        errorMsg = 'Rate limit hit. Wait a moment and try again.';
+                    } else {
+                        errorMsg = errorData.error?.message || `HTTP ${response.status}. Visit console.groq.com/keys for help.`;
+                    }
+                    
+                    showApiTestResult(`❌ ${errorMsg}`, 'error');
+                }
+            } catch (error) {
+                showApiTestResult(`❌ Connection error: ${error.message}. Check your internet.`, 'error');
+            }
+        }
+        
+        function showApiTestResult(message, type) {
+            const element = document.getElementById('apiTestResult');
+            element.innerHTML = '';
+            
+            if (type === 'loading') {
+                element.innerHTML = `<div class="alert alert-info mb-0"><span class="loading-spinner"></span>${message}</div>`;
+            } else if (type === 'success') {
+                element.innerHTML = `<div class="alert alert-success mb-0"><i class="fas fa-check-circle"></i> ${message}</div>`;
+            } else if (type === 'error') {
+                element.innerHTML = `<div class="alert alert-danger mb-0"><i class="fas fa-exclamation-circle"></i> ${message}</div>`;
+            }
+        }
+        
+        function startTimer() {
+            if (timerInterval) clearInterval(timerInterval);
+            startTime = Date.now();
+            timerInterval = setInterval(updateTimer, 1000);
+        }
+        
+        function stopTimer() {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+        }
+        
+        function updateTimer() {
+            if (!startTime) return;
+            const elapsed = Math.floor((Date.now() - startTime) / 1000);
+            const minutes = Math.floor(elapsed / 60);
+            const seconds = elapsed % 60;
+            document.getElementById('timerDisplay').textContent = 
+                `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+        
+        function determineQuestionCategory(round, role, branch) {
+            const roundLower = round.toLowerCase();
+            
+            if (roundLower.includes('hr') || roundLower.includes('behavioral')) {
+                return 'HR/Behavioral';
+            }
+            
+            if (roundLower.includes('coding') || roundLower.includes('dsa') || 
+                roundLower.includes('algorithm') || roundLower.includes('programming') ||
+                roundLower.includes('technical (dsa)')) {
+                return 'Coding/DSA';
+            }
+            
+            if (roundLower.includes('system design') || roundLower.includes('architecture')) {
+                return 'System Design';
+            }
+            
+            if (roundLower.includes('aptitude') || roundLower.includes('logical')) {
+                return 'Aptitude';
+            }
+            
+            return 'Technical/Domain';
+        }
+        
+        async function generateQuestion() {
+            if (isProcessing) return;
+            
+            if (!apiKey) {
+                showStatus('questionStatus', 'Please save and test your API key first', 'error');
+                return;
+            }
+            
+            const branch = document.getElementById('branch').value;
+            const role = document.getElementById('jobRole').value;
+            const round = document.getElementById('interviewRound').value;
+            
+            if (!branch || !role || !round) {
+                showStatus('questionStatus', 'Please select Branch, Role, and Round first', 'error');
+                return;
+            }
+            
+            isProcessing = true;
+            currentBranch = branch;
+            currentRole = role;
+            currentRound = round;
+            currentQuestionType = determineQuestionCategory(round, role, branch);
+            
+            const aiModel = document.getElementById('aiModel').value;
+            const experienceLevel = document.getElementById('experienceLevel').value;
+            const difficulty = document.getElementById('difficulty').value;
+            
+            const generateBtn = document.getElementById('generateBtn');
+            generateBtn.disabled = true;
+            generateBtn.innerHTML = '<span class="loading-spinner"></span>Generating...';
+            
+            showStatus('questionStatus', '⚡ Generating question at lightning speed...', 'loading');
+            
+            const prompt = `You are a senior technical interviewer for ${branch} branch. Generate ONE professional interview question for this specific scenario:
+
+Branch: ${branch}
+Role: ${role}
+Interview Round/Topic: ${round}
+Experience: ${experienceLevel}
+Difficulty: ${difficulty}
+
+IMPORTANT: Analyze the round type and generate appropriate question:
+- For HR/Behavioral rounds: Generate situational/behavioral questions (STAR method applicable)
+- For Coding/DSA rounds: Generate algorithmic/coding problems with constraints
+- For System Design: Generate architecture/design questions with scale requirements
+- For Technical/Domain rounds: Generate deep technical questions specific to ${branch} and ${round}
+- For Aptitude: Generate logical reasoning/quantitative questions
+
+FORMAT YOUR QUESTION PROFESSIONALLY:
+
+**Question:**
+[Write the main question here - make it clear, specific, and realistic for ${round}]
+
+**Context/Scenario:** (if applicable)
+[Brief 2-3 line context]
+
+RULES:
+- Make it realistic for ${branch} - ${role} interview
+- Question should be appropriate for ${round} round
+- Use clear formatting with bold headers
+- Be specific and detailed
+- Include technical depth appropriate to ${experienceLevel}
+- For coding: specify constraints, input/output format, examples
+- For behavioral: use STAR framework context
+- For system design: specify scale, users, requirements
+- For domain technical: include calculations, formulas, or concepts relevant to ${branch}
+
+Generate ONLY the formatted question, nothing else.`;
+            
+            try {
+                const response = await callGroqAPI(prompt, aiModel);
+                
+                if (response.success) {
+                    currentQuestion = response.data;
+                    
+                    const formattedQuestion = formatQuestionDisplay(response.data, branch, role, round, experienceLevel, difficulty);
+                    document.getElementById('questionDisplay').innerHTML = formattedQuestion;
+                    
+                    document.getElementById('userAnswer').value = '';
+                    localStorage.removeItem('current_answer');
+                    document.getElementById('feedbackDisplay').innerHTML = `
+                        <p class="text-muted text-center" style="padding: 40px 20px; font-size: 1.1rem;">
+                            📝 Answer the question above and click <strong>"Get AI Feedback"</strong> for detailed analysis!
+                        </p>
+                    `;
+                    showStatus('questionStatus', '✅ Question generated successfully!', 'success');
+                    
+                    startTimer();
+                } else {
+                    showStatus('questionStatus', `❌ ${response.error}`, 'error');
+                }
+            } catch (error) {
+                showStatus('questionStatus', `❌ Error: ${error.message}`, 'error');
+            } finally {
+                generateBtn.disabled = false;
+                generateBtn.innerHTML = '<i class="fas fa-magic"></i> Generate Question';
+                isProcessing = false;
+            }
+        }
+        
+        async function getAIFeedback() {
+            if (isProcessing) return;
+            
+            if (!apiKey) {
+                showStatus('feedbackStatus', 'Please save and test your API key first', 'error');
+                return;
+            }
+            
+            if (!currentQuestion.trim()) {
+                showStatus('feedbackStatus', 'Please generate or set a question first', 'error');
+                return;
+            }
+            
+            const userAnswer = document.getElementById('userAnswer').value.trim();
+            if (!userAnswer) {
+                showStatus('feedbackStatus', 'Please provide your answer first', 'error');
+                return;
+            }
+            
+            isProcessing = true;
+            
+            const feedbackBtn = document.getElementById('feedbackBtn');
+            feedbackBtn.disabled = true;
+            feedbackBtn.innerHTML = '<span class="loading-spinner"></span>Analyzing...';
+            
+            showStatus('feedbackStatus', '🧠 AI is analyzing your answer in detail...', 'loading');
+            
+            const aiModel = document.getElementById('aiModel').value;
+            const branch = currentBranch || document.getElementById('branch').value || 'General';
+            const role = currentRole || document.getElementById('jobRole').value || 'General';
+            const round = currentRound || document.getElementById('interviewRound').value || 'General';
+            const experienceLevel = document.getElementById('experienceLevel').value;
+            
+            const questionCategory = isCustomQuestion ? 
+                determineQuestionTypeFromContent(currentQuestion, userAnswer) : 
+                currentQuestionType;
+            
+            const prompt = generateFeedbackPrompt(
+                currentQuestion, 
+                userAnswer, 
+                branch, 
+                role, 
+                round, 
+                experienceLevel,
+                questionCategory,
+                isCustomQuestion
+            );
+            
+            try {
+                const response = await callGroqAPI(prompt, aiModel, 8000);
+                
+                if (response.success) {
+                    document.getElementById('feedbackDisplay').innerHTML = response.data;
+                    showStatus('feedbackStatus', '✅ Detailed feedback with complete solution ready!', 'success');
+                    
+                    const scoreMatch = response.data.match(/(\d+(?:\.\d+)?)\s*\/\s*10/);
+                    const score = scoreMatch ? parseFloat(scoreMatch[1]) : null;
+                    
+                    const timeSpent = startTime ? Math.floor((Date.now() - startTime) / 1000) : 0;
+                    
+                    addToHistory({
+                        question: currentQuestion,
+                        answer: userAnswer,
+                        score: score,
+                        timeSpent: timeSpent,
+                        branch: branch,
+                        role: role,
+                        round: round,
+                        experience: experienceLevel,
+                        type: questionCategory,
+                        isCustom: isCustomQuestion
+                    });
+                    
+                    stopTimer();
+                    
+                    document.getElementById('feedbackDisplay').scrollIntoView({ 
+                        behavior: 'smooth', 
+                        block: 'start' 
+                    });
+                } else {
+                    showStatus('feedbackStatus', `❌ ${response.error}`, 'error');
+                }
+            } catch (error) {
+                showStatus('feedbackStatus', `❌ Error: ${error.message}`, 'error');
+            } finally {
+                feedbackBtn.disabled = false;
+                feedbackBtn.innerHTML = '<i class="fas fa-brain"></i> Get AI Feedback';
+                isProcessing = false;
+            }
+        }
+        
+        function determineQuestionTypeFromContent(question, answer) {
+            const qLower = question.toLowerCase();
+            const aLower = answer.toLowerCase();
+            const combined = qLower + ' ' + aLower;
+            
+            const hrKeywords = ['tell me about', 'describe a time', 'how did you', 'conflict', 'team', 'leadership', 'challenge', 'weakness', 'strength'];
+            const codingKeywords = ['implement', 'algorithm', 'function', 'code', 'array', 'linked list', 'tree', 'sort', 'search', 'complexity'];
+            const systemDesignKeywords = ['design', 'architecture', 'scale', 'database', 'api', 'microservice', 'load balancer', 'cache'];
+            
+            let hrCount = hrKeywords.filter(kw => combined.includes(kw)).length;
+            let codingCount = codingKeywords.filter(kw => combined.includes(kw)).length;
+            let systemCount = systemDesignKeywords.filter(kw => combined.includes(kw)).length;
+            
+            if (hrCount > codingCount && hrCount > systemCount) return 'HR/Behavioral';
+            if (codingCount > systemCount) return 'Coding/DSA';
+            if (systemCount > 0) return 'System Design';
+            
+            return 'Technical/Domain';
+        }
+        
+        function generateFeedbackPrompt(question, answer, branch, role, round, experience, category, isCustom) {
+            let basePrompt = `You are an expert technical interviewer. Evaluate this interview response with detailed, structured feedback INCLUDING a complete solution.
+
+INTERVIEW DETAILS:
+Branch: ${branch}
+Role: ${role}
+Interview Round: ${round}
+Experience Level: ${experience}
+Question Category: ${category}
+Question Source: ${isCustom ? 'Custom (User Provided)' : 'AI Generated'}
+
+QUESTION:
+"${question}"
+
+CANDIDATE'S ANSWER:
+"${answer}"
+
+`;
+
+            if (category === 'HR/Behavioral') {
+                basePrompt += generateHRFeedbackTemplate();
+            } else if (category === 'Coding/DSA') {
+                basePrompt += generateCodingFeedbackTemplate();
+            } else if (category === 'System Design') {
+                basePrompt += generateSystemDesignFeedbackTemplate();
+            } else {
+                basePrompt += generateTechnicalFeedbackTemplate(branch, round);
+            }
+            
+            basePrompt += `
+
+CRITICAL RULES:
+1. Use EXACT HTML structure - don't modify class names
+2. Tailor solution format to question category
+3. Score 5-8 for most answers, 9-10 only for exceptional
+4. Be specific - reference actual content from candidate's answer
+5. Solutions must be complete and detailed
+6. All code must be syntactically correct
+7. Provide actionable, specific feedback`;
+
+            return basePrompt;
+        }
+        
+        function generateHRFeedbackTemplate() {
+            return `Provide feedback in this EXACT HTML format for HR/Behavioral questions:
+
+<div class="feedback-score-card">
+    <div class="score-number">X/10</div>
+    <div class="score-label">Interview Performance Rating</div>
+    <div class="score-interpretation">[e.g., "Strong Response! 🎯" or "Needs Development"]</div>
+</div>
+
+<div class="feedback-section-header">
+    <i class="fas fa-check-circle"></i>
+    <span>Response Strengths</span>
+</div>
+
+<div class="feedback-card strength">
+    <div class="feedback-card-title">
+        <div class="icon-badge"><i class="fas fa-star"></i></div>
+        <span>1. [Specific Strength]</span>
+    </div>
+    <div class="feedback-card-content">
+        [What they did well with specific examples from their answer]
+    </div>
+</div>
+
+<div class="feedback-card strength">
+    <div class="feedback-card-title">
+        <div class="icon-badge"><i class="fas fa-thumbs-up"></i></div>
+        <span>2. [Another Strength]</span>
+    </div>
+    <div class="feedback-card-content">
+        [Another positive aspect]
+    </div>
+</div>
+
+<div class="feedback-section-header">
+    <i class="fas fa-exclamation-triangle"></i>
+    <span>Areas for Improvement</span>
+</div>
+
+<div class="feedback-card improvement">
+    <div class="feedback-card-title">
+        <div class="icon-badge"><i class="fas fa-arrow-up"></i></div>
+        <span>1. [Improvement Area]</span>
+    </div>
+    <div class="feedback-card-content">
+        <strong>What's Missing:</strong> [Gap in response]<br><br>
+        <strong>How to Improve:</strong> [Specific advice]
+    </div>
+</div>
+
+<div class="feedback-card improvement">
+    <div class="feedback-card-title">
+        <div class="icon-badge"><i class="fas fa-lightbulb"></i></div>
+        <span>2. [Another Area]</span>
+    </div>
+    <div class="feedback-card-content">
+        <strong>Gap:</strong> [Issue]<br><br>
+        <strong>Solution:</strong> [How to fix]
+    </div>
+</div>
+
+<div class="hr-solution-section">
+    <h5><i class="fas fa-star"></i> Model STAR Framework Answer</h5>
+    
+    <div class="star-framework">
+        <div class="star-item">
+            <h6><i class="fas fa-flag"></i> Situation</h6>
+            <p>[Describe the context and background - 2-3 sentences setting up the scenario]</p>
+        </div>
+        
+        <div class="star-item">
+            <h6><i class="fas fa-bullseye"></i> Task</h6>
+            <p>[Explain your specific responsibility or challenge - what you needed to accomplish]</p>
+        </div>
+        
+        <div class="star-item">
+            <h6><i class="fas fa-cogs"></i> Action</h6>
+            <p>[Detail the specific steps YOU took - use "I" statements, be specific about your actions]
+            <br><br>
+            Key actions:
+            <br>• [Action 1]
+            <br>• [Action 2]
+            <br>• [Action 3]</p>
+        </div>
+        
+        <div class="star-item">
+            <h6><i class="fas fa-trophy"></i> Result</h6>
+            <p>[Quantify the outcomes - use numbers, percentages, or specific achievements]
+            <br><br>
+            Outcomes:
+            <br>• [Result 1 with metrics]
+            <br>• [Result 2 with impact]
+            <br>• [Learning/Growth]</p>
+        </div>
+    </div>
+    
+    <div style="background: white; padding: 20px; border-radius: 10px; margin-top: 15px;">
+        <h6 style="color: #d63031;"><i class="fas fa-lightbulb"></i> Pro Tips for This Type of Question</h6>
+        <ul style="line-height: 2;">
+            <li><strong>Be Specific:</strong> [Tip specific to this question type]</li>
+            <li><strong>Show Impact:</strong> [How to demonstrate value]</li>
+            <li><strong>Be Authentic:</strong> [Authenticity advice]</li>
+            <li><strong>Common Pitfalls:</strong> [What to avoid]</li>
+        </ul>
+    </div>
+</div>
+
+<div class="study-topics">
+    <h5><i class="fas fa-book-open"></i> Skills to Develop</h5>
+    <div class="study-topic-item">
+        <strong>📌 Skill 1: [Name]</strong>
+        Why important: [Explanation]
+    </div>
+    <div class="study-topic-item">
+        <strong>📌 Skill 2: [Name]</strong>
+        Why important: [Explanation]
+    </div>
+    <div class="study-topic-item">
+        <strong>📌 Skill 3: [Name]</strong>
+        Why important: [Explanation]
+    </div>
+</div>`;
+        }
+        
+        function generateCodingFeedbackTemplate() {
+            return `Provide feedback in this EXACT HTML format for Coding/DSA questions:
+
+<div class="feedback-score-card">
+    <div class="score-number">X/10</div>
+    <div class="score-label">Coding Performance Rating</div>
+    <div class="score-interpretation">[e.g., "Excellent Solution! 🚀"]</div>
+</div>
+
+<div class="feedback-section-header">
+    <i class="fas fa-check-circle"></i>
+    <span>Solution Strengths</span>
+</div>
+
+<div class="feedback-card strength">
+    <div class="feedback-card-title">
+        <div class="icon-badge"><i class="fas fa-star"></i></div>
+        <span>1. [Strength]</span>
+    </div>
+    <div class="feedback-card-content">
+        [Detailed explanation]
+    </div>
+</div>
+
+<div class="feedback-card strength">
+    <div class="feedback-card-title">
+        <div class="icon-badge"><i class="fas fa-thumbs-up"></i></div>
+        <span>2. [Strength]</span>
+    </div>
+    <div class="feedback-card-content">
+        [Detailed explanation]
+    </div>
+</div>
+
+<div class="feedback-section-header">
+    <i class="fas fa-exclamation-triangle"></i>
+    <span>Areas for Improvement</span>
+</div>
+
+<div class="feedback-card improvement">
+    <div class="feedback-card-title">
+        <div class="icon-badge"><i class="fas fa-arrow-up"></i></div>
+        <span>1. [Improvement]</span>
+    </div>
+    <div class="feedback-card-content">
+        <strong>Issue:</strong> [Problem]<br><br>
+        <strong>Solution:</strong> [Fix]
+    </div>
+</div>
+
+<div class="feedback-card improvement">
+    <div class="feedback-card-title">
+        <div class="icon-badge"><i class="fas fa-lightbulb"></i></div>
+        <span>2. [Improvement]</span>
+    </div>
+    <div class="feedback-card-content">
+        <strong>Issue:</strong> [Problem]<br><br>
+        <strong>Solution:</strong> [Fix]
+    </div>
+</div>
+
+<div class="complete-solution-section">
+    <h5><i class="fas fa-laptop-code"></i> Complete Solution with Multiple Approaches</h5>
+    
+    <div class="solution-approach">
+        <h6><span class="approach-badge">Approach 1</span> [Approach Name - e.g., Brute Force]</h6>
+        
+        <div class="step-by-step">
+            <strong style="color: #56ab2f;">Algorithm Steps:</strong>
+            <div class="step-item">
+                <div class="step-number">1</div>
+                <div>[Step 1]</div>
+            </div>
+            <div class="step-item">
+                <div class="step-number">2</div>
+                <div>[Step 2]</div>
+            </div>
+            <div class="step-item">
+                <div class="step-number">3</div>
+                <div>[Step 3]</div>
+            </div>
+        </div>
+        
+        <div class="code-block">
+<span class="comment">// Working code implementation</span>
+<span class="keyword">function</span> solutionName(params) {
+    <span class="comment">// Implementation with comments</span>
+    <span class="keyword">return</span> result;
+}
+
+<span class="comment">// Example:</span>
+console.log(solutionName(example_input)); <span class="comment">// Output: expected_output</span>
+        </div>
+        
+        <div class="complexity-info">
+            <strong>Time Complexity:</strong> O(...) - [Explanation]<br>
+            <strong>Space Complexity:</strong> O(...) - [Explanation]<br>
+            <strong>Pros:</strong> [Benefits]<br>
+            <strong>Cons:</strong> [Limitations]
+        </div>
+    </div>
+    
+    <div class="solution-approach">
+        <h6><span class="approach-badge">Approach 2</span> [Optimized Approach Name]</h6>
+        
+        <div class="step-by-step">
+            <strong style="color: #56ab2f;">Algorithm Steps:</strong>
+            <div class="step-item">
+                <div class="step-number">1</div>
+                <div>[Step 1]</div>
+            </div>
+            <div class="step-item">
+                <div class="step-number">2</div>
+                <div>[Step 2]</div>
+            </div>
+        </div>
+        
+        <div class="code-block">
+<span class="comment">// Optimized implementation</span>
+<span class="keyword">function</span> optimizedSolution(params) {
+    <span class="comment">// Better approach</span>
+    <span class="keyword">return</span> result;
+}
+        </div>
+        
+        <div class="complexity-info">
+            <strong>Time Complexity:</strong> O(...)<br>
+            <strong>Space Complexity:</strong> O(...)<br>
+            <strong>Why Better:</strong> [Comparison]
+        </div>
+    </div>
+    
+    <div class="approach-comparison">
+        <strong style="color: #56ab2f; font-size: 1.1rem;">📊 Approach Comparison</strong>
+        <table class="comparison-table">
+            <thead>
+                <tr>
+                    <th>Approach</th>
+                    <th>Time</th>
+                    <th>Space</th>
+                    <th>Best For</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Approach 1</td>
+                    <td>O(...)</td>
+                    <td>O(...)</td>
+                    <td>[Use case]</td>
+                </tr>
+                <tr>
+                    <td>Approach 2</td>
+                    <td>O(...)</td>
+                    <td>O(...)</td>
+                    <td>[Use case]</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    
+    <div class="diagram-container">
+        <strong style="color: #56ab2f;">Visual Walkthrough:</strong><br>
+        <pre style="text-align: left; font-size: 0.9rem; margin-top: 10px;">
+[ASCII visualization or step-by-step trace]
+Example:
+Input:  [1, 2, 3, 4]
+Step 1: [process]
+Step 2: [process]
+Result: [output]
+        </pre>
+    </div>
+</div>
+
+<div class="coding-platform-section">
+    <h5><i class="fas fa-code"></i> Practice This Problem Online</h5>
+    <p style="color: rgba(255,255,255,0.9); margin-bottom: 15px;">Try solving similar problems on these platforms:</p>
+    
+    <div class="platform-links">
+        <a href="https://leetcode.com/" target="_blank" style="text-decoration: none;">
+            <div class="platform-card">
+                <i class="fas fa-laptop-code"></i>
+                <h6>LeetCode</h6>
+                <p>Best for interview prep</p>
+            </div>
+        </a>
+        <a href="https://www.hackerrank.com/" target="_blank" style="text-decoration: none;">
+            <div class="platform-card">
+                <i class="fas fa-code"></i>
+                <h6>HackerRank</h6>
+                <p>Skills certification</p>
+            </div>
+        </a>
+        <a href="https://codeforces.com/" target="_blank" style="text-decoration: none;">
+            <div class="platform-card">
+                <i class="fas fa-trophy"></i>
+                <h6>Codeforces</h6>
+                <p>Competitive coding</p>
+            </div>
+        </a>
+        <a href="https://www.codechef.com/" target="_blank" style="text-decoration: none;">
+            <div class="platform-card">
+                <i class="fas fa-fire"></i>
+                <h6>CodeChef</h6>
+                <p>Practice & contests</p>
+            </div>
+        </a>
+    </div>
+</div>
+
+<div class="study-topics">
+    <h5><i class="fas fa-book-open"></i> Related Topics to Study</h5>
+    <div class="study-topic-item">
+        <strong>🎯 Topic 1: [Name]</strong>
+        Why: [Relevance to this problem]
+    </div>
+    <div class="study-topic-item">
+        <strong>🎯 Topic 2: [Name]</strong>
+        Why: [Relevance to this problem]
+    </div>
+    <div class="study-topic-item">
+        <strong>🎯 Topic 3: [Name]</strong>
+        Why: [Relevance to this problem]
+    </div>
+</div>`;
+        }
+        
+        function generateSystemDesignFeedbackTemplate() {
+            return `Provide feedback in this EXACT HTML format for System Design questions:
+
+<div class="feedback-score-card">
+    <div class="score-number">X/10</div>
+    <div class="score-label">System Design Rating</div>
+    <div class="score-interpretation">[e.g., "Solid Architecture! 🏗️"]</div>
+</div>
+
+<div class="feedback-section-header">
+    <i class="fas fa-check-circle"></i>
+    <span>Design Strengths</span>
+</div>
+
+<div class="feedback-card strength">
+    <div class="feedback-card-title">
+        <div class="icon-badge"><i class="fas fa-star"></i></div>
+        <span>1. [Strength]</span>
+    </div>
+    <div class="feedback-card-content">
+        [What they did well in their design]
+    </div>
+</div>
+
+<div class="feedback-card strength">
+    <div class="feedback-card-title">
+        <div class="icon-badge"><i class="fas fa-thumbs-up"></i></div>
+        <span>2. [Strength]</span>
+    </div>
+    <div class="feedback-card-content">
+        [Another positive aspect]
+    </div>
+</div>
+
+<div class="feedback-section-header">
+    <i class="fas fa-exclamation-triangle"></i>
+    <span>Design Gaps</span>
+</div>
+
+<div class="feedback-card improvement">
+    <div class="feedback-card-title">
+        <div class="icon-badge"><i class="fas fa-arrow-up"></i></div>
+        <span>1. [Gap]</span>
+    </div>
+    <div class="feedback-card-content">
+        <strong>Missing:</strong> [What's not addressed]<br><br>
+        <strong>Solution:</strong> [How to improve]
+    </div>
+</div>
+
+<div class="feedback-card improvement">
+    <div class="feedback-card-title">
+        <div class="icon-badge"><i class="fas fa-lightbulb"></i></div>
+        <span>2. [Gap]</span>
+    </div>
+    <div class="feedback-card-content">
+        <strong>Missing:</strong> [Issue]<br><br>
+        <strong>Solution:</strong> [Fix]
+    </div>
+</div>
+
+<div class="complete-solution-section">
+    <h5><i class="fas fa-sitemap"></i> Complete System Design Solution</h5>
+    
+    <div class="solution-approach" style="border-left-color: #2F80ED;">
+        <h6 style="color: #2F80ED;"><i class="fas fa-list-ol"></i> Step-by-Step Design Process</h6>
+        
+        <div class="step-by-step">
+            <div class="step-item">
+                <div class="step-number">1</div>
+                <div><strong>Requirements Gathering</strong><br>
+                Functional: [List key features]<br>
+                Non-Functional: [Scalability, availability, latency requirements]</div>
+            </div>
+            <div class="step-item">
+                <div class="step-number">2</div>
+                <div><strong>Capacity Estimation</strong><br>
+                Traffic: [Estimate requests/second]<br>
+                Storage: [Estimate data size]<br>
+                Bandwidth: [Calculate bandwidth needs]</div>
+            </div>
+            <div class="step-item">
+                <div class="step-number">3</div>
+                <div><strong>API Design</strong><br>
+                [List key API endpoints with methods]</div>
+            </div>
+            <div class="step-item">
+                <div class="step-number">4</div>
+                <div><strong>Database Schema</strong><br>
+                [Describe tables/collections and relationships]</div>
+            </div>
+            <div class="step-item">
+                <div class="step-number">5</div>
+                <div><strong>High-Level Architecture</strong><br>
+                [Describe major components]</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="diagram-container">
+        <strong style="color: #56ab2f; font-size: 1.2rem;">🏗️ Architecture Diagram</strong><br>
+        <pre style="text-align: left; font-size: 0.85rem; margin-top: 15px; line-height: 1.6;">
+[ASCII architecture diagram showing:]
+
+Client Apps
+    ↓
+Load Balancer
+    ↓
+API Gateway
+    ↓
+[Service Layer - draw relevant microservices]
+    ↓
+[Data Layer - databases, caches, queues]
+
+Example:
+┌─────────────┐
+│   Clients   │
+└──────┬──────┘
+       ↓
+┌─────────────────┐
+│  Load Balancer  │
+└──────┬──────────┘
+       ↓
+┌─────────────────┐
+│   API Gateway   │
+└──────┬──────────┘
+       ↓
+┌──────────────────────────────┐
+│     Service Layer            │
+│  [Auth] [Service1] [Service2]│
+└──────┬───────────────────────┘
+       ↓
+┌──────────────────────────────┐
+│      Data Layer              │
+│  [DB] [Cache] [Queue]        │
+└──────────────────────────────┘
+        </pre>
+    </div>
+    
+    <div class="solution-approach">
+        <h6><span class="approach-badge">Component</span> Detailed Component Design</h6>
+        
+        <div style="background: rgba(86, 171, 47, 0.1); padding: 15px; border-radius: 8px; margin: 10px 0;">
+            <strong style="color: #56ab2f;">1. Load Balancer</strong>
+            <p>• Algorithm: [Round-robin/Least connections/etc]<br>
+            • Health checks: [How to monitor services]<br>
+            • Failover: [Redundancy strategy]</p>
+        </div>
+        
+        <div style="background: rgba(86, 171, 47, 0.1); padding: 15px; border-radius: 8px; margin: 10px 0;">
+            <strong style="color: #56ab2f;">2. Application Servers</strong>
+            <p>• Technology: [Stack choice and reasoning]<br>
+            • Stateless design: [Why and how]<br>
+            • Auto-scaling: [Scaling strategy]</p>
+        </div>
+        
+        <div style="background: rgba(86, 171, 47, 0.1); padding: 15px; border-radius: 8px; margin: 10px 0;">
+            <strong style="color: #56ab2f;">3. Database Layer</strong>
+            <p>• Database choice: [SQL/NoSQL and why]<br>
+            • Sharding strategy: [If applicable]<br>
+            • Replication: [Master-slave/multi-master]</p>
+        </div>
+        
+        <div style="background: rgba(86, 171, 47, 0.1); padding: 15px; border-radius: 8px; margin: 10px 0;">
+            <strong style="color: #56ab2f;">4. Caching Layer</strong>
+            <p>• Cache type: [Redis/Memcached]<br>
+            • Strategy: [What to cache]<br>
+            • Invalidation: [Cache invalidation approach]</p>
+        </div>
+    </div>
+    
+    <div class="solution-approach" style="border-left-color: #f5af19;">
+        <h6 style="color: #f5af19;"><i class="fas fa-shield-alt"></i> Scalability & Reliability</h6>
+        
+        <div class="complexity-info" style="background: rgba(245, 175, 25, 0.1); border-left-color: #f5af19;">
+            <strong style="color: #f5af19;">Horizontal Scaling:</strong> [How to scale out]<br>
+            <strong style="color: #f5af19;">Data Partitioning:</strong> [Sharding strategy]<br>
+            <strong style="color: #f5af19;">CDN Integration:</strong> [For static content]<br>
+            <strong style="color: #f5af19;">Message Queues:</strong> [For async processing]<br>
+            <strong style="color: #f5af19;">Monitoring:</strong> [Logging, metrics, alerts]
+        </div>
+    </div>
+    
+    <div class="approach-comparison">
+        <strong style="color: #56ab2f; font-size: 1.1rem;">⚖️ Trade-offs & Alternatives</strong>
+        <table class="comparison-table">
+            <thead>
+                <tr>
+                    <th>Aspect</th>
+                    <th>Option A</th>
+                    <th>Option B</th>
+                    <th>Recommendation</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Database</td>
+                    <td>[SQL option]</td>
+                    <td>[NoSQL option]</td>
+                    <td>[Choice with reasoning]</td>
+                </tr>
+                <tr>
+                    <td>Caching</td>
+                    <td>[Option 1]</td>
+                    <td>[Option 2]</td>
+                    <td>[Choice with reasoning]</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="study-topics">
+    <h5><i class="fas fa-book-open"></i> Key Concepts to Master</h5>
+    <div class="study-topic-item">
+        <strong>🎯 Concept 1: [Name]</strong>
+        Relevance: [Why important for this design]
+    </div>
+    <div class="study-topic-item">
+        <strong>🎯 Concept 2: [Name]</strong>
+        Relevance: [Why important for this design]
+    </div>
+    <div class="study-topic-item">
+        <strong>🎯 Concept 3: [Name]</strong>
+        Relevance: [Why important for this design]
+    </div>
+</div>`;
+        }
+        
+        function generateTechnicalFeedbackTemplate(branch, round) {
+            return `Provide feedback in this EXACT HTML format for Technical/Domain questions (Branch: ${branch}, Round: ${round}):
+
+<div class="feedback-score-card">
+    <div class="score-number">X/10</div>
+    <div class="score-label">Technical Knowledge Rating</div>
+    <div class="score-interpretation">[e.g., "Good Understanding! 📚"]</div>
+</div>
+
+<div class="feedback-section-header">
+    <i class="fas fa-check-circle"></i>
+    <span>Answer Strengths</span>
+</div>
+
+<div class="feedback-card strength">
+    <div class="feedback-card-title">
+        <div class="icon-badge"><i class="fas fa-star"></i></div>
+        <span>1. [Strength]</span>
+    </div>
+    <div class="feedback-card-content">
+        [What they demonstrated well]
+    </div>
+</div>
+
+<div class="feedback-card strength">
+    <div class="feedback-card-title">
+        <div class="icon-badge"><i class="fas fa-thumbs-up"></i></div>
+        <span>2. [Strength]</span>
+    </div>
+    <div class="feedback-card-content">
+        [Another strength]
+    </div>
+</div>
+
+<div class="feedback-section-header">
+    <i class="fas fa-exclamation-triangle"></i>
+    <span>Knowledge Gaps</span>
+</div>
+
+<div class="feedback-card improvement">
+    <div class="feedback-card-title">
+        <div class="icon-badge"><i class="fas fa-arrow-up"></i></div>
+        <span>1. [Gap]</span>
+    </div>
+    <div class="feedback-card-content">
+        <strong>Missing Concept:</strong> [What they didn't cover]<br><br>
+        <strong>How to Address:</strong> [Study recommendations]
+    </div>
+</div>
+
+<div class="feedback-card improvement">
+    <div class="feedback-card-title">
+        <div class="icon-badge"><i class="fas fa-lightbulb"></i></div>
+        <span>2. [Gap]</span>
+    </div>
+    <div class="feedback-card-content">
+        <strong>Missing:</strong> [Gap]<br><br>
+        <strong>Solution:</strong> [Fix]
+    </div>
+</div>
+
+<div class="complete-solution-section">
+    <h5><i class="fas fa-graduation-cap"></i> Complete Technical Solution</h5>
+    
+    <div class="solution-approach">
+        <h6><span class="approach-badge">Fundamentals</span> Core Concepts Explained</h6>
+        
+        <div class="step-by-step">
+            <strong style="color: #56ab2f;">Key Concept Breakdown:</strong>
+            <div class="step-item">
+                <div class="step-number">1</div>
+                <div><strong>[Concept 1]</strong><br>
+                [Detailed explanation with formulas/equations if applicable]</div>
+            </div>
+            <div class="step-item">
+                <div class="step-number">2</div>
+                <div><strong>[Concept 2]</strong><br>
+                [Detailed explanation]</div>
+            </div>
+            <div class="step-item">
+                <div class="step-number">3</div>
+                <div><strong>[Concept 3]</strong><br>
+                [Detailed explanation]</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="solution-approach">
+        <h6><span class="approach-badge">Theory</span> Theoretical Foundation</h6>
+        
+        <div style="background: white; padding: 20px; border-radius: 8px; margin: 10px 0;">
+            <strong style="color: #56ab2f; font-size: 1.1rem;">Fundamental Principles:</strong>
+            <p style="margin-top: 10px; line-height: 1.8;">
+            [Explain the fundamental principles, laws, or theorems related to this question]
+            <br><br>
+            <strong>Key Formula/Equation (if applicable):</strong><br>
+            [Write relevant formulas with explanations]
+            <br><br>
+            <strong>Real-World Application:</strong><br>
+            [How this is used in practice]
+            </p>
+        </div>
+    </div>
+    
+    <div class="solution-approach" style="border-left-color: #2F80ED;">
+        <h6 style="color: #2F80ED;"><span class="approach-badge">Example</span> Worked Example</h6>
+        
+        <div class="step-by-step">
+            <strong style="color: #2F80ED;">Step-by-Step Solution:</strong>
+            <div class="step-item">
+                <div class="step-number">1</div>
+                <div><strong>Given:</strong> [Problem parameters]</div>
+            </div>
+            <div class="step-item">
+                <div class="step-number">2</div>
+                <div><strong>Analysis:</strong> [Break down the problem]</div>
+            </div>
+            <div class="step-item">
+                <div class="step-number">3</div>
+                <div><strong>Calculation:</strong> [Show calculations]</div>
+            </div>
+            <div class="step-item">
+                <div class="step-number">4</div>
+                <div><strong>Result:</strong> [Final answer with units]</div>
+            </div>
+        </div>
+        
+        <div class="diagram-container">
+            <strong style="color: #2F80ED;">Visual Representation:</strong><br>
+            <pre style="text-align: left; font-size: 0.9rem; margin-top: 10px;">
+[Diagram, circuit, graph, or visual explanation relevant to ${branch}]
+
+Example for circuits:
+    R1
+  ──┬┬┬┬──
+    │   │
+  + │   │ -
+  V │   │ R2
+    │   │
+  ──┴───┴──
+
+[Or describe the system/process]
+            </pre>
+        </div>
+    </div>
+    
+    <div class="approach-comparison">
+        <strong style="color: #56ab2f; font-size: 1.1rem;">📋 Important Points Summary</strong>
+        <table class="comparison-table">
+            <thead>
+                <tr>
+                    <th>Aspect</th>
+                    <th>Details</th>
+                    <th>Why Important</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>[Aspect 1]</td>
+                    <td>[Details]</td>
+                    <td>[Importance]</td>
+                </tr>
+                <tr>
+                    <td>[Aspect 2]</td>
+                    <td>[Details]</td>
+                    <td>[Importance]</td>
+                </tr>
+                <tr>
+                    <td>[Aspect 3]</td>
+                    <td>[Details]</td>
+                    <td>[Importance]</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    
+    <div class="solution-approach" style="border-left-color: #f5af19;">
+        <h6 style="color: #f5af19;"><i class="fas fa-exclamation-triangle"></i> Common Mistakes & Best Practices</h6>
+        
+        <div style="background: rgba(245, 175, 25, 0.1); padding: 15px; border-radius: 8px; margin: 10px 0;">
+            <strong style="color: #f5af19;">Common Mistakes:</strong>
+            <ul style="line-height: 2; margin-top: 10px;">
+                <li>[Mistake 1 and how to avoid it]</li>
+                <li>[Mistake 2 and how to avoid it]</li>
+                <li>[Mistake 3 and how to avoid it]</li>
+            </ul>
+        </div>
+        
+        <div style="background: rgba(86, 171, 47, 0.1); padding: 15px; border-radius: 8px; margin: 10px 0;">
+            <strong style="color: #56ab2f;">Best Practices:</strong>
+            <ul style="line-height: 2; margin-top: 10px;">
+                <li>[Best practice 1]</li>
+                <li>[Best practice 2]</li>
+                <li>[Best practice 3]</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="study-topics">
+    <h5><i class="fas fa-book-open"></i> Related Topics for ${branch}</h5>
+    <div class="study-topic-item">
+        <strong>📚 Topic 1: [Name]</strong>
+        Connection: [How it relates to this question]
+    </div>
+    <div class="study-topic-item">
+        <strong>📚 Topic 2: [Name]</strong>
+        Connection: [How it relates to this question]
+    </div>
+    <div class="study-topic-item">
+        <strong>📚 Topic 3: [Name]</strong>
+        Connection: [How it relates to this question]
+    </div>
+</div>`;
+        }
+        
+        async function callGroqAPI(prompt, model = 'llama-3.3-70b-versatile', maxTokens = 1024) {
+            try {
+                const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${apiKey}`
+                    },
+                    body: JSON.stringify({
+                        model: model,
+                        messages: [
+                            {
+                                role: 'system',
+                                content: 'You are an expert technical interviewer providing constructive, detailed feedback with complete solutions tailored to the question type.'
+                            },
+                            {
+                                role: 'user',
+                                content: prompt
+                            }
+                        ],
+                        max_tokens: maxTokens,
+                        temperature: 0.7,
+                        top_p: 0.9
+                    })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    return {
+                        success: true,
+                        data: data.choices[0].message.content
+                    };
+                }
+                
+                const errorData = await response.json().catch(() => ({}));
+                let errorMsg = 'Request failed';
+                
+                if (response.status === 401) {
+                    errorMsg = 'Invalid API key. Get new key: console.groq.com/keys';
+                } else if (response.status === 429) {
+                    errorMsg = 'Rate limit reached. Please wait a minute and try again.';
+                } else {
+                    errorMsg = errorData.error?.message || `HTTP ${response.status}`;
+                }
+                
+                return { success: false, error: errorMsg };
+                
+            } catch (error) {
+                return {
+                    success: false,
+                    error: `Connection error: ${error.message}`
+                };
+            }
+        }
+        
+        function showStatus(elementId, message, type) {
+            const element = document.getElementById(elementId);
+            if (!element) return;
+            
+            element.innerHTML = '';
+            
+            if (type === 'loading') {
+                element.innerHTML = `<div class="status-message alert alert-info"><span class="loading-spinner"></span>${message}</div>`;
+            } else if (type === 'success') {
+                element.innerHTML = `<div class="status-message alert alert-success"><i class="fas fa-check-circle"></i> ${message}</div>`;
+                setTimeout(() => { element.innerHTML = ''; }, 3000);
+            } else if (type === 'error') {
+                element.innerHTML = `<div class="status-message alert alert-danger"><i class="fas fa-exclamation-circle"></i> ${message}</div>`;
+            }
+        }
+    </script>
+</body>
+</html>
